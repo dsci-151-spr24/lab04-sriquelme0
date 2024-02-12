@@ -161,12 +161,12 @@ laquinta %>%
 
 ```{r eval = FALSE}
 laquinta %>%
-  mutate(country = case_when(
-    state %in% state.abb     ~ "United States",
-    state %in% c("ON", "BC") ~ "Canada",
-    state == "ANT"           ~ "Colombia",
-    state %in% c("AG", "QR", "CH", "NL", "VE", "PU" ~ "Mecixo",
-    state == "FM"            ~ "Honduras"))
++   mutate(country = case_when(
++     state %in% state.abb     ~ "United States",
++     state %in% c("ON", "BC") ~ "Canada",
++     state == "ANT"           ~ "Colombia",
++     state %in% c("AG", "QR", "CH", "NL", "VE", "PU" ~ "Mecixo",
++     state == "FM"            ~ "Honduras"))
 ```
 
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
@@ -181,6 +181,16 @@ laquinta <- laquinta %>%
 ```
 
 9.  Which states have the most and fewest Denny's locations? What about La Quinta? Is this surprising? Why or why not?
+
+```{r}
+dennys %>%
+  group_by(state) %>%
+  count() %>%
+  arrange(n)
+
+
+```
+according to the data Delaware, DC, and Alaska have some of the fewest.
 
 Next, let's calculate which states have the most Denny's locations *per thousand square miles*.
 This requires *joining* information from the frequency tables you created in Exercise 8 with information from the `states` data frame.
@@ -201,6 +211,26 @@ In the next exercise you will need to build on this pipe.
 
 10. Which states have the most Denny's locations per thousand square miles? What about La Quinta?
 
+District of Columbia, Rhode Island, and California have the most locations per thousand square mile for Denny's. Rhode Island, Florida, and Connecticut have the most locations per thousand square mile for La Quinta Inn.
+
+```{r}
+
+dennys %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>%
+  mutate(per_thousand = n/area*1000) %>%
+  arrange(desc(per_thousand))
+
+```
+```{r}
+
+laquinta %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>%
+  mutate(per_thousand = n/area*1000) %>%
+  arrange(desc(per_thousand))
+
+```
 Next, we put the two datasets together into a single data frame.
 However before we do so, we need to add an identifier variable.
 We'll call this `establishment` and set the value to `"Denny's"` and `"La Quinta"` for the `dennys` and `laquinta` data frames, respectively.
@@ -234,6 +264,24 @@ You can also choose different themes to change the overall look of your plots, s
 11. Filter the data for observations in North Carolina only, and recreate the plot.
     You should also adjust the transparency of the points, by setting the `alpha` level, so that it's easier to see the overplotted ones.
     Visually, does Mitch Hedberg's joke appear to hold here?
+    
+```{r}
+dn_lq %>%
+  filter(state == "NC") %>%
+
+ggplot(mapping = aes(x = longitude, y = latitude, color = establishment)) +
+  geom_point(alpha=0.5)
+
+```
+```{r}
+dn_lq %>%
+  filter(state == "TX") %>%
+
+ggplot(mapping = aes(x = longitude, y = latitude, color = establishment)) +
+  geom_point(alpha=0.1)
+
+```
+
 
 12. Now filter the data for observations in Texas only, and recreate the plot, with an appropriate `alpha` level.
     Visually, does Mitch Hedberg's joke appear to hold here?
